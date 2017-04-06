@@ -87,3 +87,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+wm_vagrant/cga-worldmap/
+.vagrant
