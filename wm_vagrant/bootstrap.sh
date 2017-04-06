@@ -336,7 +336,10 @@ sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.
 # Continue on with paver steps
 # ------------------------------------------------
 cd /vagrant/cga-worldmap/
-workon worldmap
+
+# activate the virtualenv directly 
+source /home/vagrant/.virtualenvs/worldmap/bin/activate
+#workon worldmap
 
 echo "-- Run paver build --"
 # Run paver build
