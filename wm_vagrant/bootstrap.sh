@@ -246,23 +246,23 @@ sudo service postgresql restart
 echo "-- Add postgres .pgpass file --"
 echo -n "*:*:*:postgres:123" > /home/vagrant/.pgpass
 chmod 600 .pgpass
-
+export PGPASSFILE=/home/vagrant/.pgpass
 # ------------------------------------------------
 # Postgres: Create/update databases
 # ------------------------------------------------
 echo "-- Postgres: update db, create db --"
 #
-psql -U postgres -c "update pg_database set datistemplate=false where datname='template1';"
-psql -U postgres -c "drop database Template1;"
-psql -U postgres -c "create database template1 with owner=postgres encoding='UTF-8' lc_collate='en_US.utf8' lc_ctype='en_US.utf8' template template0;"
-psql -U postgres -c "update pg_database set datistemplate=true where datname='template1';"
+PGPASSWORD=123 psql -U postgres -c "update pg_database set datistemplate=false where datname='template1';"
+PGPASSWORD=123 psql -U postgres -c "drop database Template1;"
+PGPASSWORD=123 psql -U postgres -c "create database template1 with owner=postgres encoding='UTF-8' lc_collate='en_US.utf8' lc_ctype='en_US.utf8' template template0;"
+PGPASSWORD=123 psql -U postgres -c "update pg_database set datistemplate=true where datname='template1';"
 
 # ------------------------------------------------
 # Postgres: create wm_user
 # ------------------------------------------------
 echo "-- Postgres: create wm_user with superuser privileges --"
 #
-psql -U postgres -c "CREATE USER wm_user WITH PASSWORD 'wm_password' SUPERUSER LOGIN;"
+PGPASSWORD=123 psql -U postgres -c "CREATE USER wm_user WITH PASSWORD 'wm_password' SUPERUSER LOGIN;"
 
 
 # ------------------------------------------------
@@ -270,9 +270,11 @@ psql -U postgres -c "CREATE USER wm_user WITH PASSWORD 'wm_password' SUPERUSER L
 # ------------------------------------------------
 echo "-- Postgres: create template_postgis --"
 
-createdb -U postgres -E UTF8 -O wm_user template_postgis
-psql -U postgres -d template_postgis -c "CREATE EXTENSION postgis;"
-psql -U postgres -d template_postgis -f /vagrant/cga-worldmap/geonode/static/geonode/patches/postgis/legacy_gist.sql
+PGPASSWORD=123 createdb -U postgres -E UTF8 -O wm_user template_postgis
+
+PGPASSWORD=123 psql -U postgres -d template_postgis -c "CREATE EXTENSION postgis;"
+
+PGPASSWORD=123 psql -U postgres -d template_postgis -f /vagrant/cga-worldmap/geonode/static/geonode/patches/postgis/legacy_gist.sql
 
 
 # ------------------------------------------------
@@ -280,8 +282,8 @@ psql -U postgres -d template_postgis -f /vagrant/cga-worldmap/geonode/static/geo
 # ------------------------------------------------
 echo "-- Postgres: create worldmap databases --"
 
-createdb -U postgres -E UTF8 -T template_postgis wm_db
-createdb -U postgres -E UTF8 -T template_postgis wmdata
+PGPASSWORD=123 createdb -U postgres -E UTF8 -T template_postgis wm_db
+PGPASSWORD=123 createdb -U postgres -E UTF8 -T template_postgis wmdata
 
 # ------------------------------------------------
 # Create monthly dbs for next 15 months
@@ -295,7 +297,7 @@ for i in {1..15}; do
   #echo $d
   d=$(date -I -d "$d + 1 month")
   echo "Create database wm_${d:0:4}${d:5:2}"
-  createdb -E UTF8 -U postgres -T template_postgis wm_"${d:0:4}${d:5:2}"
+  PGPASSWORD=123 createdb -E UTF8 -U postgres -T template_postgis wm_"${d:0:4}${d:5:2}"
 done
 
 # ------------------------------------------------
@@ -304,7 +306,7 @@ done
 # can create layers via API, then add a "dataverse" table.
 # ------------------------------------------------
 echo "Add dataverse db..."
-createdb -E UTF8 -U postgres -T template_postgis dataverse
+PGPASSWORD=123 createdb -E UTF8 -U postgres -T template_postgis dataverse
 
 
 # ------------------------------------------------
@@ -337,7 +339,7 @@ sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.
 # ------------------------------------------------
 cd /vagrant/cga-worldmap/
 
-# activate the virtualenv directly 
+# activate the virtualenv directly
 source /home/vagrant/.virtualenvs/worldmap/bin/activate
 #workon worldmap
 
