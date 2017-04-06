@@ -1,0 +1,36 @@
+Jetty.xml adjustment
+---------------------
+<Set name="host"><SystemProperty name="jetty.host" default="0.0.0.0"/></Set>
+<Set name="port"><SystemProperty name="jetty.port" default="8080"/></Set>
+
+
+
+
+---
+
+
+Use Ubuntu 14.04 LTS
+
+
+tail -F /vagrant/cga-worldmap/jetty.log
+tail -F /vagrant/cga-worldmap/django.log
+
+- Before running vagrant file
+- Load cga-worldmap into directory
+  - ```git clone git@github.com:cga-harvard/cga-worldmap.git```
+
+
+vagrant reload --provision
+
+
+#sudo apt-get remove maven
+#apt-get autoremove
+
+# list users
+
+- \du
+
+sudo -u postgres createdb --encoding=UTF-8 --lc-collate=en_US.utf8 -O wm_user template_postgis
+
+createdb template_postgis with owner=wm_user encoding='UTF-8'
+  lc_collate='en_US.utf8' lc_ctype='en_US.utf8' template template0;

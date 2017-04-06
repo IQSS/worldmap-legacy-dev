@@ -320,14 +320,39 @@ mkvirtualenv worldmap
 # ------------------------------------------------
 # Run pip install
 # ------------------------------------------------
+echo "-- run pip install --"
+pip install -r shared/requirements.txt
 
-#- ~~edit: ```pip install -r shared/requirements.txt```~~
-#- ~~comment out: ```pip==1.0```~~
-#  - ~~e.g. ```#pip==1.0```~~
+# ------------------------------------------------
+# Update Jetty.xml
+# ------------------------------------------------
+echo "-- Update Jetty.xml host/port --"
 
-#- Run it:
+# Set jetty.host to "0.0.0.0" from "192.168.33.16" (port is already 8080)
+#
+sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.host" default="0.0.0.0"/g' /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml
+
+# ------------------------------------------------
+# Continue on with paver steps
+# ------------------------------------------------
+cd /vagrant/cga-worldmap/
+workon worldmap
+
+echo "-- Run paver build --"
+# Run paver build
+# ------------------------------------------------
+paver build # see note2 below
+
+# ------------------------------------------------
+# Upgrade pip and reinstall django
+# ------------------------------------------------
+#echo "-- upgrade pip --"
+#pip install --upgrade pip
+#pip uninstall django
+#pip install Django==1.4.13
+
 
 # ------------------------------------------------
 # Onto manual install steps
 # ------------------------------------------------
-echo "--- See post_setup.md ---"
+echo "--- Run manual steps!  See post_setup.md ---"

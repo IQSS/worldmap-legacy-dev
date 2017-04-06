@@ -1,96 +1,50 @@
 
-### SSH into vagrant
+## SSH into vagrant
 ```
 vagrant ssh
 ```
 
-
-### Add monthly stores
-
-- Create postgis tables in the db for the next 1-2 months
-  - This is for test.  (The prod system makes monthly db tables to store new layers)
-  - For naming, use the format "wm_YYYYMM".
-    - Example names: "wm_201703", "wm_201704"
+## Django create superuser
 
 ```
-createdb -E UTF8 -U wm_user -T template_postgis wm_201703
-createdb -E UTF8 -U wm_user -T template_postgis wm_201704
-```
-
-  - **Note:** Remember the db names for the step below titled "Add geoserver stores"
-
-
-### Geonode install steps
-
-```
-cd /vagrant/cga-worldmap/
-git submodule update --init
-source ~/.bashrc
-mkvirtualenv worldmap
-```
-
-### Run pip install
-
-- ~~edit: ```pip install -r shared/requirements.txt```~~
-- ~~comment out: ```pip==1.0```~~
-  - ~~e.g. ```#pip==1.0```~~
-
-- Run it:
-
-```  
-pip install -r shared/requirements.txt
-```
-
-### Jetty config update
-
-- Jetty.xml adjustment for host and port.  Note host is "0.0.0.0"
-
-```
-<Set name="host"><SystemProperty name="jetty.host" default="0.0.0.0"/></Set>
-<Set name="port"><SystemProperty name="jetty.port" default="8080"/></Set>
-```
-
-### Continue on with paver steps
-- Next install steps
-
-```
-workon worldmap
-
-#pip install pip==1.0    # revert for paver build script
-
-pip uninstall django
-pip install Django==1.4.13 --no-cache-dir
-
-paver build # see note2 below
-pip install --upgrade pip
-
 django-admin.py createsuperuser --settings=geonode.settings
 ```
 
-### Start jetty and django separately
+## Start jetty in a separate Terminal
 
-- Start jetty
+- Open new terminal
+- cd into the directory ```.../worldmap-legacy-dev/wm_vagrant```
+- Run these commands:
 
 ```
+vagrant ssh
 cd /vagrant/cga-worldmap
 workon worldmap
 paver start_geoserver
 ```
 
-- Open: http://localhost:8080  
-  - admin/admin
+- On your local computer:
+    - Open a browser
+    - Go to: http://localhost:8080  
+       - admin/geoserver
 
+## Start Django in a separate Terminal
 
-- Start Django in another window
+- Open new terminal
+- cd into the directory ```.../worldmap-legacy-dev/wm_vagrant```
+- Run these commands:
 
 ```
+vagrant ssh
 cd /vagrant/cga-worldmap
 workon worldmap
 python manage.py runserver 0.0.0.0:8000
 ```
 
-- Open: http://localhost:8000
-  - rp/123
+- On your local computer:
+    - Open a browser
+    - Go to: http://localhost:8000  
+       - use the username/pw from the "create superuser" step above
 
 
 ## Add geoserver stores
