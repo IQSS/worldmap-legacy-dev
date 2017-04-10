@@ -142,9 +142,20 @@ sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.
 cd /vagrant/cga-worldmap/
 deactivate
 
+# ------------------------------------------------
+# Just in case django fixing steps
+# ------------------------------------------------
+cd /home/vagrant/.virtualenvs/worldmap/lib/python2.7/site-packages
+rm -rf django
+rm -rf Django-1.4.13.dist-info
+
 # activate the virtualenv directly
+cd /vagrant/cga-worldmap/
 source /home/vagrant/.virtualenvs/worldmap/bin/activate
-#workon worldmap
+
+# Reinstall django
+pip install -v django==1.4.13
+
 
 # ------------------------------------------------
 # Run paver build
@@ -152,10 +163,50 @@ source /home/vagrant/.virtualenvs/worldmap/bin/activate
 echo "-- Run paver build --"
 paver build
 
+
 # ------------------------------------------------
-# Upgrade pip and reinstall django
+# Create a django superuser
 # ------------------------------------------------
-#echo "-- upgrade pip --"
-#pip install --upgrade pip
-#pip uninstall django
-#pip install Django==1.4.13
+django-admin.py createsuperuser --settings=geonode.settings
+
+
+### Start jetty and django separately
+
+- Start jetty
+
+```
+cd /vagrant/cga-worldmap
+workon worldmap
+paver start_geoserver
+```
+
+- Open: http://localhost:8080  
+  - admin/admin
+
+
+- Start Django in another window
+
+```
+cd /vagrant/cga-worldmap
+workon worldmap
+python manage.py runserver 0.0.0.0:8000
+```
+
+- Open: http://localhost:8000
+  - rp/123
+
+
+## Add geoserver stores
+
+  - Log into http://0.0.0.0:8080/geoserver/web/
+    - admin/geoserver
+  - From the left column, click "Stores"
+  - Click "Add New Store"
+  - For "New Data Source", choose "PostGIS - PostGIS Database"
+  - Add each of your databases from the steps above titled:
+    - "Add monthly stores"
+      - e.g. "wm_201703", "wm_201704"
+    - "Add Dataverse store"
+      - e.g. "dataverse"
+  - The username/password for these steps is:
+      - wm_user/wm_password
