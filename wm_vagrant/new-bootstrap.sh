@@ -192,17 +192,18 @@ sudo apt-get install --assume-yes libxml2-dev
 sudo apt-get install --assume-yes libxslt1-dev
 
 # ------------------------------------------------
-# Add these lines to the end of the .bashrc file:
-#
+# Add these lines to the end of the .bashrc file
 # . /usr/local/bin/virtualenvwrapper.sh
 # export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre
 # export PATH=$PATH:$JAVA_HOME/bin
 # export WORKON_HOME=~/.virtualenvs
+
+
 # ------------------------------------------------
 sudo sed -i '$ a\\n# from worldmap set-up\n. /usr/local/bin/virtualenvwrapper.sh\nexport JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre\nexport PATH=$PATH:$JAVA_HOME/bin\nexport WORKON_HOME=~/.virtualenvs' /home/vagrant/.bashrc
 
-#python-dev
-#sudo pip install -e #git+git://github.com/scieloorg/packtools.git#egg=packtools
 
-
-echo "--- See post_setup.md ---"
+# ------------------------------------------------
+# Onto manual install steps
+# ------------------------------------------------
+echo "--- Run manual steps!  See post_setup.md ---"

@@ -1,83 +1,161 @@
+# ------------------------------------------------
+# Update pg_hba.conf conf file
+#
+# Replace the 2nd and 3rd occurrences of "peer" with "md5"
+#
+# Reference: http://stackoverflow.com/questions/18664074/getting-error-peer-authentication-failed-for-user-postgres-when-trying-to-ge
+# ------------------------------------------------
+echo "-- Postgres. Update conf file to fix peer authentication failure --"
 
-## SSH into vagrant
-```
-vagrant ssh
-```
+# Replace 2nd occurrence
+sudo sed -i ':a N;$!ba; s/peer/md5/2' /etc/postgresql/9.3/main/pg_hba.conf
 
-## Django create superuser
+# Replace 2nd occurrence again--originally the 3rd occurrence
+sudo sed -i ':a N;$!ba; s/peer/md5/2' /etc/postgresql/9.3/main/pg_hba.conf
 
-```
-django-admin.py createsuperuser --settings=geonode.settings
-```
+# Open db for password Reset
+sudo sed -i '1s/^/local  all   all   trust\n/' /etc/postgresql/9.3/main/pg_hba.conf
 
-## Start jetty in a separate Terminal
+# Restart postgres
+echo "-- Restart postgres --"
 
-- Open new terminal
-- cd into the directory ```.../worldmap-legacy-dev/wm_vagrant```
-- Run these commands:
+sudo service postgresql restart
 
-```
-vagrant ssh
-cd /vagrant/cga-worldmap
-workon worldmap
-paver start_geoserver
-```
+# ------------------------------------------------
+# Update postgres password to '123'
+# ------------------------------------------------
+echo "-- Set postgres user password to '123' --"
 
-- On your local computer:
-    - Open a browser
-    - Go to: http://localhost:8080  
-       - admin/geoserver
+# Set variable with the postgres password
+# ! For local testing only !
+#
+POSTGRES_PW="123"
+psql -U postgres -c "ALTER USER postgres with password '$POSTGRES_PW';"
 
-## Start Django in a separate Terminal
+# Remove 1st line that allows postgres password reset
+sudo sed -i '1d' /etc/postgresql/9.3/main/pg_hba.conf
 
-- Open new terminal
-- cd into the directory ```.../worldmap-legacy-dev/wm_vagrant```
-- Run these commands:
+# Restart postgres (again)
+echo "-- Restart postgres (again) --"
 
-```
-vagrant ssh
-cd /vagrant/cga-worldmap
-workon worldmap
-python manage.py runserver 0.0.0.0:8000
-```
+sudo service postgresql restart
 
-- On your local computer:
-    - Open a browser
-    - Go to: http://localhost:8000  
-       - use the username/pw from the "create superuser" step above
+# ------------------------------------------------
+# Add postgres .pgpass file
+# ------------------------------------------------
+echo "-- Add postgres .pgpass file --"
+echo -n "*:*:*:postgres:$POSTGRES_PW" > /home/vagrant/.pgpass
+chmod 600 .pgpass
+export PGPASSFILE=/home/vagrant/.pgpass
+# ------------------------------------------------
+# Postgres: Create/update databases
+# ------------------------------------------------
+echo "-- Postgres: update db, create db --"
+#
+PGPASSWORD=$POSTGRES_PW psql -U postgres -c "update pg_database set datistemplate=false where datname='template1';"
+PGPASSWORD=$POSTGRES_PW psql -U postgres -c "drop database Template1;"
+PGPASSWORD=$POSTGRES_PW psql -U postgres -c "create database template1 with owner=postgres encoding='UTF-8' lc_collate='en_US.utf8' lc_ctype='en_US.utf8' template template0;"
+PGPASSWORD=$POSTGRES_PW psql -U postgres -c "update pg_database set datistemplate=true where datname='template1';"
 
-
-## Add geoserver stores
-
-  - Log into http://0.0.0.0:8080/geoserver/web/
-    - admin/geoserver
-  - From the left column, click "Stores"
-  - Click "Add New Store"
-  - For "New Data Source", choose "PostGIS - PostGIS Database"
-  - Add each of your databases from the steps above titled:
-    - "Add monthly stores"
-      - e.g. "wm_201703", "wm_201704"
-    - "Add Dataverse store"
-      - e.g. "dataverse"
-  - The username/password for these steps is:
-      - wm_user/wm_password
-
----
-
-## OLD (skip)
+# ------------------------------------------------
+# Postgres: create wm_user
+# ------------------------------------------------
+echo "-- Postgres: create wm_user with superuser privileges --"
+#
+PGPASSWORD=$POSTGRES_PW psql -U postgres -c "CREATE USER wm_user WITH PASSWORD 'wm_password' SUPERUSER LOGIN;"
 
 
-- Temp django fix before paver build (may have been bad django install):
-  - see item with 11 up votes:  http://stackoverflow.com/questions/31816158/attributeerror-nonetype-object-has-no-attribute-info
+# ------------------------------------------------
+# Create PostGIS template with legacy GIST operators
+# ------------------------------------------------
+echo "-- Postgres: create template_postgis --"
+
+PGPASSWORD=$POSTGRES_PW createdb -U postgres -E UTF8 -O wm_user template_postgis
+
+PGPASSWORD=$POSTGRES_PW psql -U postgres -d template_postgis -c "CREATE EXTENSION postgis;"
+
+PGPASSWORD=$POSTGRES_PW psql -U postgres -d template_postgis -f /vagrant/cga-worldmap/geonode/static/geonode/patches/postgis/legacy_gist.sql
 
 
-  ---
-  # SKIP!!! Update for dbs
-  ---
-  sudo -u postgres psql
-  \c wm_db
-  \c wmdata
+# ------------------------------------------------
+# Create worldmap databases
+# ------------------------------------------------
+echo "-- Postgres: create worldmap databases --"
 
-  - Run the following query for both ```wm_db``` and ```wmdata```
-    - See query in file: ```index_fix.sql```
-  - From: http://stackoverflow.com/questions/13119040/failed-to-install-index-geodjango-related
+PGPASSWORD=$POSTGRES_PW createdb -U postgres -E UTF8 -T template_postgis wm_db
+PGPASSWORD=$POSTGRES_PW createdb -U postgres -E UTF8 -T template_postgis wmdata
+
+# ------------------------------------------------
+# Create monthly dbs for next 15 months
+#  The prod system makes monthly dbs to store new layers)
+#  - For naming, use the format "wm_YYYYMM".
+#    - Example names: "wm_201703", "wm_201704"
+# ------------------------------------------------
+echo "Create monthly dbs for next 15 months..."
+d=$(date +'%Y-%m-%d')
+for i in {1..15}; do
+  #echo $d
+  d=$(date -I -d "$d + 1 month")
+  echo "Create database wm_${d:0:4}${d:5:2}"
+  PGPASSWORD=$POSTGRES_PW createdb -E UTF8 -U postgres -T template_postgis wm_"${d:0:4}${d:5:2}"
+done
+
+# ------------------------------------------------
+# Add Dataverse store
+# If you're using WorldMap with Dataverse, where Dataverse (http://dataverse.org/)
+# can create layers via API, then add a "dataverse" table.
+# ------------------------------------------------
+echo "Add dataverse db..."
+PGPASSWORD=$POSTGRES_PW createdb -E UTF8 -U postgres -T template_postgis dataverse
+
+echo "MAY NEED THE REST TO BE MANUAL STEPS"
+
+# ------------------------------------------------
+# Geonode install steps
+# ------------------------------------------------
+echo "Geonode install steps..."
+
+git clone git://github.com/cga-harvard/cga-worldmap.git cga-worldmap
+cd /vagrant/cga-worldmap/
+git submodule update --init
+source ~/.bashrc
+mkvirtualenv worldmap
+
+# ------------------------------------------------
+# Run pip install
+# ------------------------------------------------
+echo "-- run pip install --"
+pip install -r shared/requirements.txt
+
+# ------------------------------------------------
+# Update Jetty.xml
+# ------------------------------------------------
+echo "-- Update Jetty.xml host/port --"
+
+# Set jetty.host to "0.0.0.0" from "192.168.33.16" (port is already 8080)
+#
+sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.host" default="0.0.0.0"/g' /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml
+
+# ------------------------------------------------
+# Continue on with paver steps
+# ------------------------------------------------
+cd /vagrant/cga-worldmap/
+deactivate
+
+# activate the virtualenv directly
+source /home/vagrant/.virtualenvs/worldmap/bin/activate
+#workon worldmap
+
+# ------------------------------------------------
+# Run paver build
+# ------------------------------------------------
+echo "-- Run paver build --"
+paver build
+
+# ------------------------------------------------
+# Upgrade pip and reinstall django
+# ------------------------------------------------
+#echo "-- upgrade pip --"
+#pip install --upgrade pip
+#pip uninstall django
+#pip install Django==1.4.13
