@@ -49,7 +49,7 @@ sudo service postgresql restart
 # ------------------------------------------------
 echo "-- Add postgres .pgpass file --"
 echo -n "*:*:*:postgres:$POSTGRES_PW" > /home/vagrant/.pgpass
-chmod 600 .pgpass
+chmod 600 /home/vagrant/.pgpass
 export PGPASSFILE=/home/vagrant/.pgpass
 # ------------------------------------------------
 # Postgres: Create/update databases
