@@ -1,3 +1,7 @@
+# ssh into your vagrant environment via: "vagrant ssh"
+cd /vagrant/cga-worldmap
+
+
 # ------------------------------------------------
 # Update pg_hba.conf conf file
 #
