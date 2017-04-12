@@ -10,6 +10,10 @@ These are not general use instructions but meant to get a local machine running 
 
 ## Prerequisites
 
+### Install VirtualBox
+
+- https://www.virtualbox.org/wiki/Downloads
+
 ### Install vagrant
 
 - https://www.vagrantup.com/downloads.html
