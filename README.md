@@ -8,29 +8,49 @@ These are not general use instructions but meant to get a local machine running 
 
 ---
 
+## Components
+
+Your goal is to install the following services:
+
+- Geoserver (Jetty) which serves layers
+- WorldMap (Django) which provides the GUI and API
+
+The following databases will be created:
+
+- core
+- dataverse
+- monthly
+
 ## Prerequisites
 
-### Install vagrant
+### Install Vagrant and VirtualBox
 
 - https://www.vagrantup.com/downloads.html
+- https://www.virtualbox.org
 
-### Pull WorldMap legacy into this directory
+### Build the basic Vagrant box
 
-- Open a terminal and cd into _this_ repository
-- Run the following:
-
-      ```
-      cd wm_vagrant
-      git clone git@github.com:cga-harvard/cga-worldmap.git
-      ```
-
-### Build the basic vagrant box
-
-- If you're not there already, open a Terminal and cd into the ```wm_vagrant``` directory
+- If you're not there already, open a terminal and cd into the ```wm_vagrant``` directory
 - Run the following command.
 
-    ```
     vagrant up
-    ```
 
   - This will take several minutes as the VM is being built.
+
+### Run commands individually that install and spin up Geoserver (Jetty)
+
+In a new terminal:
+
+    cd wm_vagrant
+    vagrant ssh
+    # run each command one by one
+    cat /worldmap-legacy-dev/post_setup2.sh
+
+### Run commands individually that install and spin up WorldMap (Django)
+
+In a new terminal:
+
+    cd wm_vagrant
+    vagrant ssh
+    # run each command one by one
+    cat /worldmap-legacy-dev/post_setup3.sh

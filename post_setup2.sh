@@ -6,6 +6,7 @@ echo "Geonode install steps..."
 cd /vagrant
 git clone git://github.com/cga-harvard/cga-worldmap.git cga-worldmap
 cd /vagrant/cga-worldmap/
+# FIXME: investigate this error: Clone of 'git://github.com/geoext/geoext.git' into submodule path 'src/geonode-client/app/static/externals/geoext' failed
 git submodule update --init
 source ~/.bashrc
 mkvirtualenv worldmap
@@ -23,6 +24,7 @@ echo "-- Update Jetty.xml host/port --"
 
 # Set jetty.host to "0.0.0.0" from "192.168.33.16" (port is already 8080)
 #
+sudo cp /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml.orig
 sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.host" default="0.0.0.0"/g' /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml
 
 # ------------------------------------------------

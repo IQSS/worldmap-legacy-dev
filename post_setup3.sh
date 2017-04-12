@@ -11,7 +11,6 @@ python manage.py runserver 0.0.0.0:8000
 # Go to: http://localhost:8000  
 # Use the credentials from the 'createsuperuser' step above
 
-
 #------------------------------------------------
 ## Add geoserver stores
 #------------------------------------------------
