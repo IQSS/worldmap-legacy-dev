@@ -136,6 +136,38 @@ echo "-- Update Jetty.xml host/port --"
 #
 sudo sed -i ':a N;$!ba; s/name="jetty.host" default="192.168.33.16"/name="jetty.host" default="0.0.0.0"/g' /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml
 
+# Set jetty.port from 8080 to 8081
+#
+# <Set name="port"><SystemProperty name="jetty.port" default="8081"/></Set>
+#
+sudo sed -i ':a N;$!ba; s/name="jetty.port" default="8080"/name="jetty.port" default="8081"/g' /vagrant/cga-worldmap/src/geoserver-geonode-ext/jetty.xml
+
+# ------------------------------------------------
+# Create a local_settings.py to change port
+# ------------------------------------------------
+echo "-- Update Django urls for Geoserver --"
+
+# remove file (if it exists)
+# --------------------------
+rm -f /vagrant/cga-worldmap/geonode/local_settings.py
+
+# write new file
+# --------------------------
+cat <<FMARKER>> /vagrant/cga-worldmap/geonode/local_settings.py
+
+# (Move geoserver to port 8081)
+
+# The FULLY QUALIFIED url to the GeoServer instance for this GeoNode.
+GEOSERVER_BASE_URL = "http://localhost:8081/geoserver/"
+
+# The FULLY QUALIFIED url to the GeoNetwork instance for this GeoNode
+GEONETWORK_BASE_URL = "http://localhost:8081/geonetwork/"
+
+FMARKER
+
+
+
+
 # ------------------------------------------------
 # Continue on with paver steps
 # ------------------------------------------------
