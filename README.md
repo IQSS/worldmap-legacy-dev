@@ -18,23 +18,31 @@ These are not general use instructions but meant to get a local machine running 
 
 - https://www.vagrantup.com/downloads.html
 
-### Pull WorldMap legacy into this directory
-
-- Open a terminal and cd into _this_ repository
-- Run the following:
-
-      ```
-      cd wm_vagrant
-      git clone git@github.com:cga-harvard/cga-worldmap.git
-      ```
-
 ### Build the basic vagrant box
 
-- If you're not there already, open a Terminal and cd into the ```wm_vagrant``` directory
-- Run the following command.
+- Clone this repository
 
-    ```
-    vagrant up
-    ```
+```
+git clone git@github.com:IQSS/worldmap-legacy-dev.git
+```
 
-  - This will take several minutes as the VM is being built.
+- Open a terminal and cd into the repository (```.../worldmap-legacy-dev```)
+- Run the following:
+
+```
+cd wm_vagrant
+vagrant up
+```
+
+- This will take several minutes as the VM is being built.
+
+### Manual WorldMap install steps
+
+(Note: many of these steps can be moved into the ```bootstrap.sh``` file.)
+
+1. In the Terminal, you should be in the ```wm_vagrant``` directory
+1. SSH into the vagrant box: ```vagrant ssh```
+1. On your local machine, open the file:
+  - worldmap-legacy-dev/post_setup.txt
+1. Read through the ```post_setup.txt```, copy the commands (a few lines at a time) and run them in the vagrant shell.
+  - Toward the end of the file, follow the comments to open additional Terminals and run the WorldMap.
