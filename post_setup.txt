@@ -1,5 +1,5 @@
 # ssh into your vagrant environment via: "vagrant ssh"
-cd /vagrant/cga-worldmap
+#cd /vagrant/cga-worldmap
 
 
 # ------------------------------------------------
@@ -95,13 +95,13 @@ PGPASSWORD=$POSTGRES_PW createdb -U postgres -E UTF8 -T template_postgis wmdata
 #  - For naming, use the format "wm_YYYYMM".
 #    - Example names: "wm_201703", "wm_201704"
 # ------------------------------------------------
-echo "Create monthly dbs for next 15 months..."
+echo "Create monthly dbs for next 5 months..."
 d=$(date +'%Y-%m-%d')
-for i in {1..15}; do
+for i in {1..5}; do
   #echo $d
-  d=$(date -I -d "$d + 1 month")
   echo "Create database wm_${d:0:4}${d:5:2}"
   PGPASSWORD=$POSTGRES_PW createdb -E UTF8 -U postgres -T template_postgis wm_"${d:0:4}${d:5:2}"
+  d=$(date -I -d "$d + 1 month")
 done
 
 # ------------------------------------------------
@@ -186,7 +186,7 @@ workon worldmap
 paver start_geoserver
 
 # Open a web browser on your local machine (not the VM)
-# Go to: http://localhost:8080  
+# Go to: http://localhost:8080
 # credentials: admin/admin
 
 
@@ -199,7 +199,7 @@ workon worldmap
 python manage.py runserver 0.0.0.0:8000
 
 # Open a web browser on your local machine (not the VM)
-# Go to: http://localhost:8000  
+# Go to: http://localhost:8000
 # Use the credentials from the 'createsuperuser' step above
 
 
