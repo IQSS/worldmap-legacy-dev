@@ -208,8 +208,10 @@ paver build
 # ------------------------------------------------
 # Create a django superuser
 # ------------------------------------------------
+
+# For this next command:
+# Remember the credentials for the "Start Django" step later on
 django-admin.py createsuperuser --settings=geonode.settings
-# remember these credentials for the "Start Django" step below
 
 ### Start jetty and django separately
 # ------------------------------------------------
