@@ -22,8 +22,18 @@ These are not general use instructions but meant to get a local machine running 
 
 - Clone this repository
 
+- Open a Terminal
+
 ```
-git clone git@github.com:IQSS/worldmap-legacy-dev.git
+# Note: "worldmap-legacy-dev" is the parent directory of this repository
+cd worldmap-legacy-dev/wm_vagrant
+
+# Clone the WorldMap repository (may take a few minutes)
+git clone git://github.com/cga-harvard/cga-worldmap.git
+
+# Update the git submodules for the WorldMap repository
+cd cga-worldmap/
+git submodule update --init
 ```
 
 - Open a terminal and cd into the repository (```.../worldmap-legacy-dev```)

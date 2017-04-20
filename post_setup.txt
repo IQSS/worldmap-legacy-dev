@@ -115,9 +115,9 @@ echo "MAY NEED THE REST TO BE MANUAL STEPS"
 # ------------------------------------------------
 echo "Geonode install steps..."
 
-git clone git://github.com/cga-harvard/cga-worldmap.git cga-worldmap
+#git clone git://github.com/cga-harvard/cga-worldmap.git cga-worldmap
 cd /vagrant/cga-worldmap/
-git submodule update --init
+#git submodule update --init
 source ~/.bashrc
 mkvirtualenv worldmap
 
@@ -126,6 +126,15 @@ mkvirtualenv worldmap
 # ------------------------------------------------
 echo "-- run pip install --"
 pip install -r shared/requirements.txt
+
+# ------------------------------------------------
+# Update pavement.py
+# ------------------------------------------------
+
+# Update for local build BUT don't check pavement.py changes into repoistory!!
+#
+sudo sed -i ':a N;$!ba; s/localhost:8080\/geoserver/localhost:8081\/geoserver/g' /vagrant/cga-worldmap/pavement.py
+
 
 # ------------------------------------------------
 # Update Jetty.xml
