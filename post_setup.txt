@@ -172,6 +172,39 @@ GEOSERVER_BASE_URL = "http://localhost:8081/geoserver/"
 # The FULLY QUALIFIED url to the GeoNetwork instance for this GeoNode
 GEONETWORK_BASE_URL = "http://localhost:8081/geonetwork/"
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'wm_db',
+        'USER': 'wm_user',
+        'PASSWORD': 'wm_password',
+        'HOST': 'localhost',
+        'PORT': '5432'
+        },
+    'wmdata': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'wmdata',
+        'USER': 'wm_user',
+        'PASSWORD': 'wm_password',
+        'HOST': 'localhost',
+        'PORT': '5432'
+        }
+    }
+
+#Import uploaded shapefiles into a database such as PostGIS?
+DB_DATASTORE = True
+
+DB_DATASTORE_DATABASE = 'dataverse'
+DB_DATASTORE_USER = 'wm_user'
+DB_DATASTORE_PASSWORD = 'wm_password'
+DB_DATASTORE_HOST = 'localhost'
+DB_DATASTORE_PORT = '5432'
+DB_DATASTORE_TYPE = 'django.contrib.gis.db.backends.postgis'
+# Name of the store in geoserver
+DB_DATASTORE_NAME = 'dataverse'
+DB_DATASTORE_ENGINE = 'django.contrib.gis.db.backends.postgis'
+
+
 FMARKER
 
 
